@@ -14,7 +14,8 @@ RUN mkdir -p /opt/actions-runner && \
     libffi-dev \
     python3-dev \
     python3-pip \
-    jq
+    jq \
+    docker.io 
 
 ARG RUNNER_VERSION=2.301.1
 
