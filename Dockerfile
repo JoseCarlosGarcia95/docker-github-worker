@@ -1,20 +1,34 @@
-ARG ALPINE_VERSION=3.17.2
+ARG DEBIAN_VERSION=11.6
 
-FROM amd64/alpine:${ALPINE_VERSION}
+FROM amd64/debian:${DEBIAN_VERSION}
 
+RUN useradd -m -s /bin/bash runner
 
-RUN mkdir -p /actions-runner && \
-    apk add --no-cache --virtual .build-deps \
+RUN mkdir -p /opt/actions-runner && \
+    apt-get update && \
+    apt-get install -y \
     curl \
-    tar 
+    tar \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    python3-dev \
+    python3-pip \
+    jq
 
 ARG RUNNER_VERSION=2.301.1
 
 RUN curl -o /tmp/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
     -L https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz
 
-RUN tar xzf /tmp/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz -C /actions-runner
+RUN tar xzf /tmp/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz -C /opt/actions-runner
+RUN /bin/bash -c "/opt/actions-runner/bin/installdependencies.sh"
+RUN chown -R runner:runner /opt/actions-runner
 
-COPY ./bin /actions-runner/bin
+COPY ./bin/entrypoint.sh /bin/
+
+RUN chmod +x /bin/entrypoint.sh
+
+USER runner
 
 ENTRYPOINT [ "/bin/entrypoint.sh" ]
