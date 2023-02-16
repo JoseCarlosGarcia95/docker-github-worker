@@ -22,16 +22,6 @@ RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
     apt-get update && \
     apt-get install -y docker-ce-cli
 
-ENV BUILDX_VERSION=v0.8.2
-ENV DOCKER_COMPOSE_VERSION=v2.5.1
-
-# Docker Plugins
-RUN mkdir -p "${HOME}/.docker/cli-plugins" \
-    && curl -SsL "https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-amd64" -o "${HOME}/.docker/cli-plugins/docker-buildx" \
-    && curl -SsL "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64" -o "${HOME}/.docker/cli-plugins/docker-compose" \
-    && chmod +x "${HOME}/.docker/cli-plugins/docker-buildx" \
-    && chmod +x "${HOME}/.docker/cli-plugins/docker-compose"
-
 ARG RUNNER_VERSION=2.301.1
 
 RUN curl -o /tmp/actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz \
@@ -46,5 +36,15 @@ COPY ./bin/entrypoint.sh /bin/
 RUN chmod +x /bin/entrypoint.sh
 
 USER runner
+
+ENV BUILDX_VERSION=v0.8.2
+ENV DOCKER_COMPOSE_VERSION=v2.5.1
+
+# Docker Plugins
+RUN mkdir -p "${HOME}/.docker/cli-plugins" \
+    && curl -SsL "https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-amd64" -o "${HOME}/.docker/cli-plugins/docker-buildx" \
+    && curl -SsL "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64" -o "${HOME}/.docker/cli-plugins/docker-compose" \
+    && chmod +x "${HOME}/.docker/cli-plugins/docker-buildx" \
+    && chmod +x "${HOME}/.docker/cli-plugins/docker-compose"
 
 ENTRYPOINT [ "/bin/entrypoint.sh" ]
