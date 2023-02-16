@@ -14,8 +14,13 @@ RUN mkdir -p /opt/actions-runner && \
     libffi-dev \
     python3-dev \
     python3-pip \
-    jq \
-    docker.io 
+    jq 
+
+# Install latest version of Docker
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - && \
+    echo "deb [arch=amd64] https://download.docker.com/linux/debian buster stable" > /etc/apt/sources.list.d/docker.list && \
+    apt-get update && \
+    apt-get install -y docker-ce-cli
 
 ARG RUNNER_VERSION=2.301.1
 
